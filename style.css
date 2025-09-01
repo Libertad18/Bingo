@@ -1,0 +1,155 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: radial-gradient(circle, #6a0dad, #4b0082);
+  color: white;
+  text-align: center;
+  transition: background 0.3s, color 0.3s;
+}
+
+body.light {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #4b0082;
+  padding: 10px 20px;
+  color: white;
+  flex-wrap: wrap;
+}
+
+.navbar .logo {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.nav-links li {
+  cursor: pointer;
+}
+
+.toggles {
+  display: flex;
+  gap: 10px;
+}
+
+.container {
+  padding: 20px;
+  max-width: 800px;
+  margin: auto;
+}
+
+.selection-area {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.number-board {
+  flex: 1;
+  min-width: 250px;
+  max-width: 400px;
+}
+
+.preview-area {
+  flex: 1;
+  min-width: 250px;
+  max-width: 300px;
+}
+
+#numberGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+  gap: 5px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 10px;
+  background-color: rgba(255,255,255,0.1);
+  border-radius: 10px;
+}
+
+.card-container {
+  margin: 20px auto;
+  max-width: 300px;
+}
+
+.card-header {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  font-weight: bold;
+  margin-bottom: 5px;
+  font-size: 1.2em;
+}
+
+.card {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  gap: 10px;
+}
+
+.cell {
+  background-color: white;
+  color: black;
+  padding: 15px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.cell.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.cell.marked {
+  background-color: #00bfff;
+  color: white;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #ffcc00;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.hidden {
+  display: none;
+}
+
+#timer {
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+
+#ballDisplay {
+  font-size: 1.3em;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+#calledList {
+  font-size: 0.9em;
+  margin-bottom: 10px;
+  max-height: 80px;
+  overflow-y: auto;
+  padding: 5px;
+}
+
+.wallet {
+  margin: 10px 0;
+}

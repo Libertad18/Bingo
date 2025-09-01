@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aman Bingo</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">🎯 Aman Bingo</div>
+    <ul class="nav-links">
+      <li>Home</li>
+      <li>Contact</li>
+      <li>Leaderboard</li>
+      <li>Referral Earning</li>
+    </ul>
+    <div class="toggles">
+      <select id="languageToggle" onchange="toggleLanguage()">
+        <option value="en">English</option>
+        <option value="am">አማርኛ</option>
+      </select>
+      <button onclick="toggleTheme()">🌓</button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1 id="title">Welcome to Aman Bingo</h1>
+    <div class="wallet">
+      <span id="walletLabel">Wallet:</span> <span id="wallet">100</span> BBR
+    </div>
+
+    <label id="stakeLabel">Choose Stake:</label>
+    <select id="stakeSelect">
+      <option value="10">10 BBR</option>
+      <option value="20">20 BBR</option>
+      <option value="50">50 BBR</option>
+    </select>
+
+    <div class="selection-area">
+      <div id="numberBoard" class="number-board">
+        <p>Select a number to generate your card:</p>
+        <div id="numberGrid"></div>
+      </div>
+
+      <div id="previewArea" class="preview-area">
+        <h2>Card Preview</h2>
+        <div class="card-container">
+          <div class="card-header">
+            <div>B</div><div>I</div><div>N</div><div>G</div><div>O</div>
+          </div>
+          <div id="previewCard" class="card"></div>
+        </div>
+        <button onclick="confirmCard()">✅ Confirm</button>
+      </div>
+    </div>
+
+    <div id="gameArea" class="hidden">
+      <div id="timer">⏱ 30</div>
+      <div id="ballDisplay">Ball Called: —</div>
+      <div id="calledList"><strong>Called Numbers:</strong> <span id="calledNumbers"></span></div>
+      <div class="card-container">
+        <div class="card-header">
+          <div>B</div><div>I</div><div>N</div><div>G</div><div>O</div>
+        </div>
+        <div id="card" class="card"></div>
+      </div>
+      <button id="bingoBtn" class="hidden" onclick="checkBingo()">🎉 Bingo</button>
+      <div id="result"></div>
+      <button id="playAgainBtn" class="hidden" onclick="resetGame()">🔁 Play Again</button>
+    </div>
+  </div>
+
+  <audio id="callSound" src="call.mp3"></audio>
+  <script src="script.js"></script>
+</body>
+</html>
