@@ -3,75 +3,78 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🎯 Aman Bingo</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <title>🎯 Bingo Blast</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!-- Using a robust Tailwind CSS CDN link -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css"> <!-- Your custom styles -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"></script>
 </head>
-<body class="bg-gradient-to-br from-purple-600 to-pink-400 text-white font-poppins transition-all duration-500">
-  <nav class="navbar bg-gradient-to-r from-indigo-800 to-purple-700 p-4 shadow-2xl flex justify-between items-center flex-wrap">
-    <div class="logo text-2xl sm:text-3xl font-extrabold tracking-tight">🎯 Aman Bingo</div>
+<body class="text-white font-poppins transition-all duration-500">
+  <nav class="navbar p-4 shadow-2xl flex justify-between items-center flex-wrap">
+    <div class="logo text-2xl sm:text-3xl font-extrabold tracking-tight">🎯 Bingo Blast</div>
     <ul class="nav-links flex gap-4 sm:gap-8 flex-wrap">
-      <li class="cursor-pointer hover:text-neon-green transition-colors transform hover:scale-105 text-sm sm:text-base" role="button" tabIndex="0" onclick="navigate('home')">Home</li>
-      <li class="cursor-pointer hover:text-neon-green transition-colors transform hover:scale-105 text-sm sm:text-base" role="button" tabIndex="0" onclick="navigate('contact')">Contact</li>
-      <li class="cursor-pointer hover:text-neon-green transition-colors transform hover:scale-105 text-sm sm:text-base" role="button" tabIndex="0" onclick="navigate('leaderboard')">Leaderboard</li>
-      <li class="cursor-pointer hover:text-neon-green transition-colors transform hover:scale-105 text-sm sm:text-base" role="button" tabIndex="0" onclick="navigate('referral')">Referral Earning</li>
+      <li class="cursor-pointer text-sm sm:text-base" role="button" tabIndex="0" onclick="navigate('home')">Home</li>
+      <li class="cursor-pointer text-sm sm:text-base" role="button" tabIndex="0" onclick="navigate('contact')">Contact</li>
+      <li class="cursor-pointer text-sm sm:text-base" role="button" tabIndex="0" onclick="navigate('leaderboard')">Leaderboard</li>
+      <li class="cursor-pointer text-sm sm:text-base" role="button" tabIndex="0" onclick="navigate('referral')">Referral Earning</li>
     </ul>
     <div class="toggles flex gap-4 items-center">
-      <select id="languageSelect" class="bg-transparent text-white border-2 border-neon-green rounded-lg p-1 sm:p-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-neon-green text-sm sm:text-base">
+      <select id="languageSelect" class="p-1 sm:p-2 cursor-pointer text-sm sm:text-base">
         <option value="en" class="text-black">English</option>
         <option value="am" class="text-black">አማርኛ</option>
       </select>
-      <button id="themeToggle" class="text-xl sm:text-2xl focus:outline-none focus:ring-2 focus:ring-neon-green" aria-label="Toggle theme">🌓</button>
+      <button id="themeToggle" class="text-xl sm:text-2xl" aria-label="Toggle theme">🌓</button>
     </div>
   </nav>
 
   <div class="container mx-auto p-4 sm:p-8 max-w-5xl">
-    <h1 id="welcome" class="text-3xl sm:text-5xl font-extrabold mb-6 sm:mb-8 animate-bounce">Welcome to Aman Bingo</h1>
+    <h1 id="welcome" class="text-3xl sm:text-5xl font-extrabold mb-6 sm:mb-8 text-center animate-bounce">Welcome to Bingo Blast!</h1>
 
-    <div class="wallet text-base sm:text-xl font-bold mb-4 sm:mb-6 bg-neon-pink bg-opacity-20 p-3 sm:p-4 rounded-lg">Wallet: <span id="wallet">100</span> BBR</div>
+    <div class="wallet text-base sm:text-xl font-bold mb-4 sm:mb-6 rounded-lg text-center">Wallet: <span id="wallet">100</span> BBR</div>
 
     <div class="selection-area flex flex-wrap gap-6 sm:gap-10 justify-center transition-all duration-700">
-      <div class="number-board bg-white bg-opacity-20 rounded-2xl p-4 sm:p-8 shadow-2xl w-full max-w-lg transform hover:scale-105 transition-transform">
-        <h3 id="chooseStake" class="text-lg sm:text-2xl font-bold mb-4 text-neon-green">Choose Stake:</h3>
-        <select id="stakeSelect" class="w-full p-2 sm:p-3 rounded-lg bg-gray-800 text-white mb-4 sm:mb-6 focus:outline-none focus:ring-2 focus:ring-neon-green text-sm sm:text-base">
+      <div class="number-board rounded-2xl p-4 sm:p-8 shadow-2xl w-full max-w-lg">
+        <h3 id="chooseStake" class="text-lg sm:text-2xl font-bold mb-4">Choose Your Stake:</h3>
+        <select id="stakeSelect" class="w-full p-2 sm:p-3 rounded-lg mb-4 sm:mb-6 text-sm sm:text-base">
           <option value="10">10 BBR</option>
           <option value="20">20 BBR</option>
           <option value="50">50 BBR</option>
         </select>
-        <h3 id="selectNumber" class="text-lg sm:text-2xl font-bold mb-4 text-neon-green">Select a number to generate your card:</h3>
-        <div id="numberGrid" class="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-2 sm:gap-3 max-h-80 sm:max-h-96 overflow-y-auto p-4 sm:p-6 rounded-xl bg-gray-900 bg-opacity-50"></div>
+        <h3 id="selectNumber" class="text-lg sm:text-2xl font-bold mb-4">Pick a number to generate your unique card:</h3>
+        <div id="numberGrid" class="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-2 sm:gap-3 max-h-80 sm:max-h-96 overflow-y-auto p-4 sm:p-6 rounded-xl"></div>
       </div>
 
-      <div class="preview-area card-container bg-white bg-opacity-20 rounded-2xl p-4 sm:p-8 shadow-2xl w-full max-w-sm sm:max-w-md">
-        <h3 id="cardPreview" class="text-lg sm:text-2xl font-bold mb-4 text-neon-green">Card Preview</h3>
-        <div class="card-header grid grid-cols-5 font-extrabold text-neon-green text-base sm:text-xl mb-3">
+      <div class="preview-area card-container rounded-2xl p-4 sm:p-8 shadow-2xl w-full max-w-sm sm:max-w-md">
+        <h3 id="cardPreview" class="text-lg sm:text-2xl font-bold mb-4">Your Card Preview</h3>
+        <div class="card-header grid grid-cols-5 font-extrabold text-base sm:text-xl mb-3 text-center">
           <div>B</div><div>I</div><div>N</div><div>G</div><div>O</div>
         </div>
         <div id="previewCard" class="card grid grid-cols-5 gap-2 sm:gap-4"></div>
-        <button id="confirmBtn" onclick="confirmCard()" class="mt-4 sm:mt-6 bg-neon-green text-gray-900 px-6 sm:px-8 py-2 sm:py-3 rounded-lg hover:bg-green-400 transition-transform transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-neon-green text-sm sm:text-base" aria-label="Confirm card">✅ Confirm</button>
+        <button id="confirmBtn" class="mt-4 sm:mt-6 px-6 sm:px-8 py-2 sm:py-3 rounded-lg text-sm sm:text-base" aria-label="Confirm card">✅ Confirm Card</button>
       </div>
     </div>
 
-    <div id="gameArea" class="hidden">
-      <div id="ballDisplay" class="text-lg sm:text-2xl font-bold mb-4 sm:mb-6 animate-pulse">Ball Called: —</div>
-      <div id="calledList" class="text-sm sm:text-lg mb-4 sm:mb-6 max-h-24 sm:max-h-32 overflow-y-auto p-4 sm:p-6 bg-white bg-opacity-20 rounded-xl">Called Numbers: <span id="calledNumbers"></span></div>
-      <div class="card-container bg-white bg-opacity-20 rounded-2xl p-4 sm:p-8 shadow-2xl w-full max-w-sm sm:max-w-md mx-auto">
-        <div class="card-header grid grid-cols-5 font-extrabold text-neon-green text-base sm:text-xl mb-3">
+    <div id="gameArea" class="hidden text-center">
+      <div id="ballDisplay" class="text-lg sm:text-2xl font-bold mb-4 sm:mb-6 animate-pulse">Ball Called: <span class="text-white">—</span></div>
+      <div id="calledList" class="text-sm sm:text-lg mb-4 sm:mb-6 max-h-24 sm:max-h-32 overflow-y-auto p-4 sm:p-6 rounded-xl text-left">Called Numbers: <span id="calledNumbers" class="text-white"></span></div>
+      <div class="card-container rounded-2xl p-4 sm:p-8 shadow-2xl w-full max-w-sm sm:max-w-md mx-auto">
+        <div class="card-header grid grid-cols-5 font-extrabold text-base sm:text-xl mb-3 text-center">
           <div>B</div><div>I</div><div>N</div><div>G</div><div>O</div>
         </div>
         <div id="card" class="card grid grid-cols-5 gap-2 sm:gap-4"></div>
       </div>
-      <button id="bingoBtn" class="hidden mt-4 sm:mt-6 bg-neon-green text-gray-900 px-6 sm:px-8 py-2 sm:py-3 rounded-lg hover:bg-green-400 transition-transform transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-neon-green text-sm sm:text-base" onclick="checkBingo()" aria-label="Check for Bingo">🎉 Bingo</button>
+      <button id="bingoBtn" class="hidden mt-4 sm:mt-6 px-6 sm:px-8 py-2 sm:py-3 rounded-lg text-sm sm:text-base" onclick="checkBingo()" aria-label="Check for Bingo">🎉 Bingo!</button>
       <div id="result" class="text-lg sm:text-2xl font-bold mt-4 sm:mt-6"></div>
-      <button id="playAgainBtn" class="hidden mt-4 sm:mt-6 bg-neon-green text-gray-900 px-6 sm:px-8 py-2 sm:py-3 rounded-lg hover:bg-green-400 transition-transform transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-neon-green text-sm sm:text-base" onclick="resetGame()" aria-label="Play again">🔁 Play Again</button>
+      <button id="playAgainBtn" class="hidden mt-4 sm:mt-6 px-6 sm:px-8 py-2 sm:py-3 rounded-lg text-sm sm:text-base" onclick="resetGame()" aria-label="Play again">🔁 Play Again</button>
     </div>
   </div>
 
-  <audio id="callSound" src="https://assets.mixkit.co/active_storage/sfx/2630/2630-preview.mp3"></audio>
-  <audio id="winSound" src="https://assets.mixkit.co/active_storage/sfx/2007/2007-preview.mp3"></audio>
+  <audio id="callSound" src="https://assets.mixkit.co/active_storage/sfx/2630/2630-preview.mp3" preload="auto"></audio>
+  <audio id="winSound" src="https://assets.mixkit.co/active_storage/sfx/2007/2007-preview.mp3" preload="auto"></audio>
+  <!-- Optional: Add a sound for losing or "no bingo" -->
+  <audio id="loseSound" src="https://assets.mixkit.co/active_storage/sfx/2859/2859-preview.mp3" preload="auto"></audio>
 
   <script src="script.js"></script>
 </body>
