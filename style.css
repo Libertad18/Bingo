@@ -1,170 +1,482 @@
 :root {
-  --neon-green: #39ff14;
-  --neon-pink: #ff2e63;
-  --shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-  --transition: all 0.4s ease;
+  --primary-bg-dark: #1a1a2e; /* Darker background */
+  --secondary-bg-dark: #1f4068; /* Slightly lighter for elements */
+  --text-color-dark: #e0e0e0; /* Light text on dark */
+  --accent-color-1: #e43f5a; /* Deep Red/Pink for accents */
+  --accent-color-2: #84a9ac; /* Muted Cyan for highlights */
+  --soft-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  --inset-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+  --border-radius-lg: 1rem;
+  --transition-fast: all 0.2s ease-in-out;
+  --transition-medium: all 0.4s ease;
+
+  /* Light Theme Variables */
+  --primary-bg-light: #fdfdfd;
+  --secondary-bg-light: #f0f4f8;
+  --text-color-light: #333333;
+  --light-accent-1: #d63d6b; /* Stronger pink for emphasis */
+  --light-accent-2: #6ba8a9; /* Softer cyan */
+  --light-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 body {
-  background: linear-gradient(to bottom right, #7c3aed, #ec4899);
+  font-family: 'Poppins', sans-serif;
+  background: var(--primary-bg-dark);
+  color: var(--text-color-dark);
+  transition: var(--transition-medium);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 body.light {
-  background: linear-gradient(to bottom, #fef3c7, #fed7aa) !important;
-  color: #1f2937 !important;
+  background: var(--primary-bg-light);
+  color: var(--text-color-light);
 }
 
-body.light .navbar, body.light .number-board, body.light .card-container, body.light #calledList {
-  background: rgba(255, 255, 255, 0.8) !important;
-  color: #1f2937 !important;
+/* Base element styles for light theme */
+body.light .navbar,
+body.light .number-board,
+body.light .card-container,
+body.light #calledList {
+  background: var(--secondary-bg-light) !important;
+  color: var(--text-color-light) !important;
+  box-shadow: var(--light-shadow);
 }
 
 body.light .cell {
-  background: #f3f4f6 !important;
-  color: #1f2937 !important;
+  background: #ffffff !important;
+  color: var(--text-color-light) !important;
+  box-shadow: var(--light-shadow);
 }
 
 body.light #numberGrid button {
-  background: #f3f4f6 !important;
-  color: #1f2937 !important;
+  background: #e9eff5 !important;
+  color: var(--text-color-light) !important;
+  box-shadow: var(--light-shadow);
 }
 
+body.light .toggles select {
+    background-color: var(--secondary-bg-light);
+    color: var(--text-color-light);
+    border-color: var(--light-accent-2);
+}
+
+body.light #stakeSelect {
+    background-color: var(--secondary-bg-light);
+    color: var(--text-color-light);
+    border-color: var(--light-accent-2);
+}
+
+
+/* Navbar */
 .navbar {
-  background: linear-gradient(to right, #4c1d95, #7e22ce);
+  background: var(--secondary-bg-dark);
+  box-shadow: var(--soft-shadow);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  border-bottom: 2px solid var(--accent-color-1);
+}
+
+.logo {
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  color: var(--accent-color-2);
+  text-shadow: 0 0 8px rgba(132, 169, 172, 0.7);
 }
 
 .nav-links li {
-  padding: 8px 12px;
-  border-radius: 12px;
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius-lg);
+  transition: var(--transition-fast);
+  cursor: pointer;
+  font-weight: 600;
 }
 
 .nav-links li:hover {
-  background: rgba(255, 255, 255, 0.3);
-  color: var(--neon-green);
+  background: rgba(var(--accent-color-2), 0.2);
+  color: var(--accent-color-1);
+  transform: translateY(-2px);
+  text-shadow: 0 0 5px rgba(228, 63, 90, 0.5);
 }
 
 .toggles select,
 .toggles button {
-  padding: 8px;
-  border-radius: 12px;
-  transition: var(--transition);
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.75rem;
+  transition: var(--transition-fast);
+  background: var(--primary-bg-dark); /* Match body for select */
+  color: var(--text-color-dark);
+  border: 1px solid var(--accent-color-2);
+  box-shadow: var(--inset-shadow);
 }
+
+body.light .toggles select,
+body.light .toggles button {
+    background: var(--secondary-bg-light);
+    color: var(--text-color-light);
+    border: 1px solid var(--light-accent-2);
+}
+
 
 .toggles select:focus,
 .toggles button:focus {
-  outline: 3px solid var(--neon-green);
+  outline: none;
+  border-color: var(--accent-color-1);
+  box-shadow: 0 0 0 3px rgba(var(--accent-color-1), 0.5);
 }
 
-.number-board {
-  transition: var(--transition);
+/* Main Container */
+.container {
+  flex-grow: 1;
+  padding: 2rem;
+}
+
+/* Wallet */
+.wallet {
+  background: linear-gradient(90deg, var(--accent-color-1), var(--accent-color-2));
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: var(--border-radius-lg);
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-shadow: var(--soft-shadow);
+  box-shadow: var(--soft-shadow);
+}
+
+/* Selection Area */
+.selection-area {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+  justify-content: center;
+  transition: var(--transition-medium);
+}
+
+.number-board,
+.card-container {
+  background: var(--secondary-bg-dark);
+  border-radius: var(--border-radius-lg);
+  padding: 2rem;
+  box-shadow: var(--soft-shadow);
+  transition: var(--transition-medium);
+}
+
+.number-board:hover,
+.card-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+}
+
+h3 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: var(--accent-color-2);
+  text-shadow: 0 0 5px rgba(132, 169, 172, 0.3);
+}
+
+body.light h3 {
+    color: var(--light-accent-2);
+    text-shadow: none;
+}
+
+#stakeSelect {
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 0.75rem;
+  background: var(--primary-bg-dark);
+  color: var(--text-color-dark);
+  border: 1px solid var(--accent-color-2);
+  margin-bottom: 1.5rem;
+  box-shadow: var(--inset-shadow);
 }
 
 #numberGrid {
+  display: grid;
   grid-template-columns: repeat(10, 1fr);
+  gap: 0.75rem;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 1rem;
+  border-radius: var(--border-radius-lg);
+  background: rgba(0, 0, 0, 0.3);
+  box-shadow: var(--inset-shadow);
 }
 
+#numberGrid::-webkit-scrollbar {
+  width: 8px;
+}
+
+#numberGrid::-webkit-scrollbar-thumb {
+  background: var(--accent-color-1);
+  border-radius: 4px;
+}
+
+#numberGrid button {
+  padding: 0.8rem 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 0.6rem;
+  background: #333d52; /* Darker gray for buttons */
+  color: var(--text-color-dark);
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  box-shadow: var(--soft-shadow);
+}
+
+#numberGrid button:hover {
+  background: var(--accent-color-2);
+  color: white;
+  transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(132, 169, 172, 0.7);
+}
+
+#numberGrid button.selected-seed {
+    background: var(--accent-color-1);
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(228, 63, 90, 0.8);
+    animation: pulse-border 1s infinite alternate;
+}
+
+@keyframes pulse-border {
+    from { border-color: rgba(255, 255, 255, 0.5); }
+    to { border-color: rgba(255, 255, 255, 1); }
+}
+
+/* Card Styling */
+.card-header {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  font-weight: 800;
+  color: var(--accent-color-1);
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 5px rgba(228, 63, 90, 0.4);
+}
+
+body.light .card-header {
+    color: var(--light-accent-1);
+    text-shadow: none;
+}
+
+.card {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.75rem;
+}
+
+.card .cell {
+  padding: 1rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border-radius: 0.75rem;
+  background: #333d52; /* Darker gray for cells */
+  color: var(--text-color-dark);
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  box-shadow: var(--soft-shadow);
+  user-select: none;
+}
+
+body.light .card .cell {
+    background: #ffffff;
+    color: var(--text-color-light);
+}
+
+.card .cell.disabled {
+  pointer-events: none;
+  opacity: 0.7;
+  cursor: not-allowed;
+  box-shadow: var(--inset-shadow);
+}
+
+.card .cell:not(.disabled):hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+  background: var(--accent-color-2);
+  color: white;
+}
+
+.cell.marked {
+  background: var(--accent-color-1) !important;
+  color: white !important;
+  animation: mark-bounce 0.4s ease forwards;
+  box-shadow: 0 0 15px var(--accent-color-1), var(--inset-shadow);
+}
+
+body.light .cell.marked {
+    background: var(--light-accent-1) !important;
+    box-shadow: 0 0 15px var(--light-accent-1), var(--inset-shadow);
+}
+
+
+@keyframes mark-bounce {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1.1); opacity: 1; }
+}
+
+/* Buttons */
+button {
+  box-shadow: var(--soft-shadow);
+  border: none;
+  cursor: pointer;
+}
+
+#confirmBtn, #bingoBtn, #playAgainBtn {
+  margin-top: 1.5rem;
+  background: var(--accent-color-2);
+  color: white;
+  padding: 0.8rem 1.8rem;
+  border-radius: var(--border-radius-lg);
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: var(--transition-fast);
+}
+
+body.light #confirmBtn, body.light #bingoBtn, body.light #playAgainBtn {
+    background: var(--light-accent-2);
+    color: white;
+}
+
+#confirmBtn:hover, #bingoBtn:hover, #playAgainBtn:hover {
+  background: var(--accent-color-1);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* Game Area */
+#ballDisplay {
+  font-size: 2rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: var(--accent-color-1);
+  text-shadow: 0 0 10px rgba(228, 63, 90, 0.7);
+  animation: pulse-text 1.5s infinite alternate;
+}
+
+body.light #ballDisplay {
+    color: var(--light-accent-1);
+    text-shadow: none;
+}
+
+@keyframes pulse-text {
+    from { opacity: 0.8; }
+    to { opacity: 1; }
+}
+
+#calledList {
+  background: var(--secondary-bg-dark);
+  border-radius: var(--border-radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  max-height: 120px;
+  overflow-y: auto;
+  box-shadow: var(--inset-shadow);
+  line-height: 1.6;
+  font-size: 1rem;
+  color: var(--text-color-dark);
+}
+
+#calledNumbers {
+    font-weight: 600;
+    color: var(--accent-color-2);
+}
+
+body.light #calledNumbers {
+    color: var(--light-accent-2);
+}
+
+#result {
+  font-size: 2.5rem;
+  font-weight: 800;
+  text-align: center;
+  margin-top: 2rem;
+  color: var(--accent-color-1);
+  text-shadow: 0 0 15px rgba(228, 63, 90, 0.9);
+  animation: fadeInScale 0.7s ease-out;
+}
+
+body.light #result {
+    color: var(--light-accent-1);
+    text-shadow: none;
+}
+
+@keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+
+/* Responsive adjustments */
 @media (max-width: 1024px) {
+  .logo {
+    font-size: 1.8rem;
+  }
+  .nav-links {
+    gap: 1rem;
+  }
+  .nav-links li {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+  .toggles select,
+  .toggles button {
+    padding: 0.5rem 0.7rem;
+    font-size: 0.9rem;
+  }
   #numberGrid {
     grid-template-columns: repeat(8, 1fr);
   }
 }
 
 @media (max-width: 768px) {
-  #numberGrid {
-    grid-template-columns: repeat(6, 1fr);
-  }
-}
-
-@media (max-width: 480px) {
-  #numberGrid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-#numberGrid button {
-  padding: 10px;
-  font-size: 0.9rem;
-  border-radius: 10px;
-  transition: var(--transition);
-}
-
-@media (min-width: 640px) {
-  #numberGrid button {
-    padding: 12px;
-    font-size: 1.1rem;
-  }
-}
-
-#numberGrid button:hover {
-  background: var(--neon-pink);
-  color: white;
-  transform: scale(1.2);
-}
-
-.card-container {
-  transition: var(--transition);
-}
-
-.card-header div {
-  padding: 10px;
-}
-
-.card .cell {
-  padding: 12px;
-  font-size: 1rem;
-  border-radius: 10px;
-  transition: var(--transition);
-  box-shadow: var(--shadow);
-}
-
-@media (min-width: 640px) {
-  .card .cell {
-    padding: 16px;
-    font-size: 1.2rem;
-  }
-}
-
-.card .cell:hover:not(.disabled) {
-  transform: scale(1.2);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6);
-}
-
-.cell.marked {
-  background: var(--neon-pink) !important;
-  color: white !important;
-  animation: mark 0.5s ease;
-}
-
-@keyframes mark {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.4); }
-  100% { transform: scale(1.15); }
-}
-
-button {
-  box-shadow: var(--shadow);
-}
-
-#calledList::-webkit-scrollbar {
-  width: 10px;
-}
-
-#calledList::-webkit-scrollbar-thumb {
-  background: var(--neon-green);
-  border-radius: 6px;
-}
-
-@media (max-width: 768px) {
   .navbar {
     flex-direction: column;
-    gap: 12px;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  .nav-links {
+    margin-top: 0.5rem;
+    width: 100%;
+    justify-content: center;
+  }
+  .toggles {
+    margin-top: 1rem;
   }
   .selection-area {
     flex-direction: column;
     align-items: center;
   }
-  .container {
-    padding: 4px;
+  .number-board,
+  .card-container {
+    width: 95%;
+    max-width: none;
+    padding: 1.5rem;
+  }
+  #numberGrid {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.6rem;
+    padding: 0.8rem;
+  }
+  .card .cell {
+    padding: 0.8rem;
+    font-size: 1rem;
+  }
+  #ballDisplay {
+    font-size: 1.6rem;
+  }
+  #result {
+      font-size: 2rem;
   }
 }
 
@@ -173,12 +485,53 @@ button {
     font-size: 1.5rem;
   }
   .nav-links li {
-    padding: 6px 10px;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
   }
   .toggles select,
   .toggles button {
-    padding: 6px;
+    font-size: 0.8rem;
+    padding: 0.4rem 0.6rem;
+  }
+  h1 {
+    font-size: 2rem;
+  }
+  .wallet {
+    font-size: 1rem;
+    padding: 0.8rem 1rem;
+  }
+  h3 {
+    font-size: 1.4rem;
+  }
+  #numberGrid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+    padding: 0.5rem;
+  }
+  #numberGrid button {
+    font-size: 0.8rem;
+    padding: 0.6rem 0.3rem;
+  }
+  .card-header {
+    font-size: 1.2rem;
+    margin-bottom: 0.8rem;
+  }
+  .card .cell {
+    padding: 0.6rem;
     font-size: 0.9rem;
+  }
+  #confirmBtn, #bingoBtn, #playAgainBtn {
+    font-size: 0.9rem;
+    padding: 0.6rem 1.2rem;
+  }
+  #ballDisplay {
+    font-size: 1.4rem;
+  }
+  #calledList {
+    font-size: 0.9rem;
+    padding: 1rem;
+  }
+  #result {
+      font-size: 1.8rem;
   }
 }
