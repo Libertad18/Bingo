@@ -1,10 +1,11 @@
-const socket = io("https://bingo-xodt.onrender.com");
+const socket = io("https://bingo-xodt.onrender.com", { transports: ['websocket'], reconnectionAttempts: 3 });
 
 let card = [];
 let previewCardData = [];
 let calledNumbers = [];
 let countdown = 30;
 let timerInterval;
+let callInterval;
 let wallet = 100;
 let stake = 10;
 let language = 'en';
@@ -24,7 +25,8 @@ const translations = {
     insufficientBalance: "Insufficient balance",
     win: "🎉 You Win!",
     lose: "❌ Not a winning card",
-    someoneWon: "🎉 Someone won!"
+    someoneWon: "🎉 Someone won!",
+    serverError: "Failed to connect to the game server. Using local simulation."
   },
   am: {
     welcome: "እንኳን ወደ አማን ቢንጎ በደህና መጡ",
@@ -39,12 +41,17 @@ const translations = {
     insufficientBalance: "በቂ ሒሳብ የለም",
     win: "🎉 አሸንፈሃል!",
     lose: "❌ አሸናፊ ካርድ አይደለም",
-    someoneWon: "🎉 አንድ ሰው አሸንፏል!"
+    someoneWon: "🎉 አንድ ሰው አሸንፏል!",
+    serverError: "የጨዋታ አገልጋይ ግንኙነት አልተሳካም። የአካባቢ ማስመሰል በመጠቀም።"
   }
 };
 
 function toggleTheme() {
   document.body.classList.toggle('light');
+  const isLight = document.body.classList.contains('light');
+  document.body.style.background = isLight
+    ? 'linear-gradient(to bottom, #fef3c7, #fed7aa)'
+    : 'linear-gradient(to bottom right, #7c3aed, #ec4899)';
 }
 
 function changeLanguage(lang) {
@@ -67,7 +74,7 @@ function generateNumberBoard() {
     const btn = document.createElement('button');
     btn.textContent = i;
     btn.setAttribute('aria-label', `Select number ${i}`);
-    btn.className = 'bg-white text-gray-900 p-3 rounded-lg hover:bg-blue-400 hover:text-white transition-transform transform hover:scale-110';
+    btn.className = 'bg-white text-gray-900 p-4 rounded-lg hover:bg-neon-pink hover:text-white transition-transform transform hover:scale-115';
     btn.onclick = () => previewCard(i);
     btn.onkeydown = (e) => { if (e.key === 'Enter') previewCard(i); };
     grid.appendChild(btn);
@@ -100,6 +107,7 @@ function confirmCard() {
   socket.emit("startGame", roomId);
 
   startTimer();
+  startNumberCalling(); // Start local number calling as fallback
 }
 
 function generateCard(seed) {
@@ -122,7 +130,7 @@ function renderCard(data, containerId, isPreview = false) {
     for (let col = 0; col < 5; col++) {
       const num = data[col][row];
       const cell = document.createElement('div');
-      cell.className = `cell ${isPreview ? 'disabled' : ''} bg-white text-gray-900 p-4 rounded-lg font-bold text-center`;
+      cell.className = `cell ${isPreview ? 'disabled' : ''} bg-white text-gray-900 p-5 rounded-lg font-bold text-center`;
       cell.textContent = num;
       cell.setAttribute('aria-label', `Number ${num}`);
       if (!isPreview && num !== "Free") {
@@ -131,7 +139,7 @@ function renderCard(data, containerId, isPreview = false) {
         cell.onkeydown = (e) => { if (e.key === 'Enter') markCell(cell, num); };
       }
       if (num === "Free" || (!isPreview && calledNumbers.includes(num))) {
-        cell.classList.add('marked', 'bg-blue-400', 'text-white');
+        cell.classList.add('marked', 'bg-neon-pink', 'text-white');
       }
       container.appendChild(cell);
     }
@@ -141,7 +149,7 @@ function renderCard(data, containerId, isPreview = false) {
 function markCell(cell, num) {
   if (calledNumbers.includes(num) || num === "Free") {
     cell.classList.toggle('marked');
-    cell.classList.toggle('bg-blue-400');
+    cell.classList.toggle('bg-neon-pink');
     cell.classList.toggle('text-white');
     document.getElementById('bingoBtn').classList.remove('hidden');
   }
@@ -151,7 +159,7 @@ function autoMarkCard(num) {
   const cells = document.querySelectorAll('#card .cell');
   cells.forEach(cell => {
     if (cell.textContent === num.toString()) {
-      cell.classList.add('marked', 'bg-blue-400', 'text-white');
+      cell.classList.add('marked', 'bg-neon-pink', 'text-white');
       document.getElementById('bingoBtn').classList.remove('hidden');
     }
   });
@@ -170,18 +178,32 @@ function startTimer() {
     document.getElementById('timer').textContent = `⏱ ${countdown}`;
     if (countdown <= 0) {
       clearInterval(timerInterval);
+      clearInterval(callInterval);
       document.getElementById('result').textContent = translations[language].lose;
       document.getElementById('playAgainBtn').classList.remove('hidden');
     }
   }, 1000);
 }
 
-function pauseTimer() {
-  clearInterval(timerInterval);
+function startNumberCalling() {
+  // Fallback for number calling if server is not responding
+  callInterval = setInterval(() => {
+    const num = Math.floor(Math.random() * 75) + 1;
+    socket.emit("numberCalled", num); // Emit to server
+    handleNumberCalled(num); // Handle locally
+  }, 5000); // Call every 5 seconds
 }
 
-function resumeTimer() {
-  startTimer();
+function handleNumberCalled(num) {
+  if (!calledNumbers.includes(num)) {
+    calledNumbers.push(num);
+    const prefix = getColumnPrefix(num);
+    document.getElementById('ballDisplay').textContent = `Ball Called: ${prefix}–${num}`;
+    document.getElementById('calledNumbers').textContent += `${prefix}-${num} `;
+    document.getElementById('callSound').play();
+    autoMarkCard(num);
+    enableCard();
+  }
 }
 
 function getColumnPrefix(num) {
@@ -211,7 +233,8 @@ function checkBingo() {
     document.getElementById('winSound').play();
     socket.emit("playerWin", roomId);
     clearInterval(timerInterval);
-    wallet += stake * 2; // Example reward
+    clearInterval(callInterval);
+    wallet += stake * 2;
     document.getElementById('wallet').textContent = wallet;
   } else {
     document.getElementById('result').textContent = translations[language].lose;
@@ -221,7 +244,8 @@ function checkBingo() {
 }
 
 function resetGame() {
-  pauseTimer();
+  clearInterval(timerInterval);
+  clearInterval(callInterval);
   countdown = 30;
   document.getElementById('gameArea').classList.add('hidden');
   document.getElementById('card').innerHTML = '';
@@ -241,23 +265,19 @@ socket.on("connect", () => {
 
 socket.on("connect_error", (err) => {
   console.error("Connection error:", err);
-  alert("Failed to connect to the game server. Please try again later.");
+  alert(translations[language].serverError);
+  // Continue with local number calling
 });
 
-socket.on("numberCalled", num => {
-  calledNumbers.push(num);
-  const prefix = getColumnPrefix(num);
-  document.getElementById('ballDisplay').textContent = `Ball Called: ${prefix}–${num}`;
-  document.getElementById('calledNumbers').textContent += `${prefix}-${num} `;
-  document.getElementById('callSound').play();
-  autoMarkCard(num);
-  enableCard();
+socket.on("numberCalled", (num) => {
+  handleNumberCalled(num);
 });
 
 socket.on("announceWinner", () => {
   document.getElementById('result').textContent = translations[language].someoneWon;
   document.getElementById('winSound').play();
   clearInterval(timerInterval);
+  clearInterval(callInterval);
   document.getElementById('playAgainBtn').classList.remove('hidden');
 });
 
@@ -265,5 +285,5 @@ window.onload = () => {
   generateNumberBoard();
   document.getElementById('themeToggle').onclick = toggleTheme;
   document.getElementById('languageSelect').onchange = (e) => changeLanguage(e.target.value);
-  changeLanguage('en'); // Set default language
+  changeLanguage('en');
 };
