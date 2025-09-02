@@ -1,5 +1,5 @@
 {
-  "name": "aman-bingo-server",
+  "name": "aman-bingo-backend",
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
