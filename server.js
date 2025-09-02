@@ -1,47 +1,56 @@
-const express = require("express");
-const http = require("http");
-const { Server } = require("socket.io");
+```javascript
+const express = require('express');
+const http = require('http');
+const socketIo = require('socket.io');
+const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {
-  cors: { origin: "*" }
+const io = socketIo(server, {
+  cors: {
+    origin: '*', // Allow connections from your frontend
+    methods: ['GET', 'POST']
+  }
 });
 
-const rooms = {};
+// Serve static files (index.html, style.css, script.js)
+app.use(express.static(path.join(__dirname, 'public')));
 
-io.on("connection", socket => {
-  socket.on("joinRoom", roomId => {
+// Handle root route
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Socket.IO logic
+io.on('connection', (socket) => {
+  console.log('A user connected:', socket.id);
+
+  socket.on('joinRoom', (roomId) => {
     socket.join(roomId);
-    if (!rooms[roomId]) {
-      rooms[roomId] = { players: [], started: false };
-    }
-    rooms[roomId].players.push(socket.id);
-
-    if (!rooms[roomId].started && rooms[roomId].players.length >= 2) {
-      rooms[roomId].started = true;
-      io.to(roomId).emit("startCountdown");
-    }
-
-    io.to(roomId).emit("playerList", rooms[roomId].players);
+    console.log(`User joined room: ${roomId}`);
   });
 
-  socket.on("sendMessage", ({ roomId, username, avatar, message }) => {
-    io.to(roomId).emit("chatMessage", { username, avatar, message });
+  socket.on('startGame', (roomId) => {
+    console.log(`Game started in room: ${roomId}`);
+    // You can add number calling logic here if server-driven
   });
 
-  socket.on("playerWin", roomId => {
-    io.to(roomId).emit("announceWinner");
+  socket.on('numberCalled', (num) => {
+    io.to(socket.rooms.values().next().value).emit('numberCalled', num);
   });
 
-  socket.on("disconnect", () => {
-    for (const roomId in rooms) {
-      rooms[roomId].players = rooms[roomId].players.filter(id => id !== socket.id);
-      io.to(roomId).emit("playerList", rooms[roomId].players);
-    }
+  socket.on('playerWin', (roomId) => {
+    io.to(roomId).emit('announceWinner');
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
   });
 });
 
-server.listen(3000, () => {
-  console.log("Aman Bingo backend running on port 3000");
+// Use Render's assigned port or default to 3000 for local testing
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
+```
