@@ -14,12 +14,27 @@ body.light {
   color: #1f2937 !important;
 }
 
+body.light .navbar, body.light .number-board, body.light .card-container, body.light #calledList {
+  background: rgba(255, 255, 255, 0.8) !important;
+  color: #1f2937 !important;
+}
+
+body.light .cell {
+  background: #f3f4f6 !important;
+  color: #1f2937 !important;
+}
+
+body.light #numberGrid button {
+  background: #f3f4f6 !important;
+  color: #1f2937 !important;
+}
+
 .navbar {
   background: linear-gradient(to right, #4c1d95, #7e22ce);
 }
 
 .nav-links li {
-  padding: 12px 18px;
+  padding: 8px 12px;
   border-radius: 12px;
 }
 
@@ -30,7 +45,7 @@ body.light {
 
 .toggles select,
 .toggles button {
-  padding: 10px;
+  padding: 8px;
   border-radius: 12px;
   transition: var(--transition);
 }
@@ -44,11 +59,40 @@ body.light {
   transition: var(--transition);
 }
 
+#numberGrid {
+  grid-template-columns: repeat(10, 1fr);
+}
+
+@media (max-width: 1024px) {
+  #numberGrid {
+    grid-template-columns: repeat(8, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  #numberGrid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  #numberGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
 #numberGrid button {
-  padding: 16px;
-  font-size: 1.2rem;
-  border-radius: 12px;
+  padding: 10px;
+  font-size: 0.9rem;
+  border-radius: 10px;
   transition: var(--transition);
+}
+
+@media (min-width: 640px) {
+  #numberGrid button {
+    padding: 12px;
+    font-size: 1.1rem;
+  }
 }
 
 #numberGrid button:hover {
@@ -62,15 +106,22 @@ body.light {
 }
 
 .card-header div {
-  padding: 14px;
+  padding: 10px;
 }
 
 .card .cell {
-  padding: 20px;
-  font-size: 1.3rem;
-  border-radius: 14px;
+  padding: 12px;
+  font-size: 1rem;
+  border-radius: 10px;
   transition: var(--transition);
   box-shadow: var(--shadow);
+}
+
+@media (min-width: 640px) {
+  .card .cell {
+    padding: 16px;
+    font-size: 1.2rem;
+  }
 }
 
 .card .cell:hover:not(.disabled) {
@@ -95,7 +146,7 @@ button {
 }
 
 #calledList::-webkit-scrollbar {
-  width: 12px;
+  width: 10px;
 }
 
 #calledList::-webkit-scrollbar-thumb {
@@ -106,13 +157,28 @@ button {
 @media (max-width: 768px) {
   .navbar {
     flex-direction: column;
-    gap: 14px;
+    gap: 12px;
   }
   .selection-area {
     flex-direction: column;
     align-items: center;
   }
-  #numberGrid {
-    grid-template-columns: repeat(6, minmax(50px, 1fr));
+  .container {
+    padding: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo {
+    font-size: 1.5rem;
+  }
+  .nav-links li {
+    padding: 6px 10px;
+    font-size: 0.9rem;
+  }
+  .toggles select,
+  .toggles button {
+    padding: 6px;
+    font-size: 0.9rem;
   }
 }
