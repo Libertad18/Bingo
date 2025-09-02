@@ -1,4 +1,4 @@
-const socket = io("https://YOUR-BACKEND-URL"); // Replace with your backend URL
+const socket = io("https://bingo-xodt.onrender.com"); // Replace with your backend URL
 
 let card = [];
 let previewCardData = [];
