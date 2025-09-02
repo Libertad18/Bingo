@@ -1,4 +1,4 @@
-const socket = io("https://bingo-xodt.onrender.com", { transports: ['websocket'], reconnectionAttempts: 3 });
+const socket = io("https://bingo-1-n9o2.onrender.com", { transports: ['websocket'], reconnectionAttempts: 3 });
 
 let card = [];
 let previewCardData = [];
