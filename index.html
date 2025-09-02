@@ -1,21 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
-
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Aman Bingo</title>
+  <title>Aman Bingo Multiplayer</title>
   <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
 </head>
 <body>
   <nav class="navbar">
     <div class="logo">🎯 Aman Bingo</div>
     <ul class="nav-links">
-      <li>Home</li>
+      <li onclick="showHome()">Home</li>
       <li>Contact</li>
       <li>Leaderboard</li>
-      <li>Referral Earning</li>
+      <li>Referral</li>
     </ul>
     <div class="toggles">
       <select id="languageToggle" onchange="toggleLanguage()">
@@ -27,38 +26,47 @@
   </nav>
 
   <div class="container">
-    <h1 id="title">Welcome to Aman Bingo</h1>
-    <div class="wallet">
-      <span id="walletLabel">Wallet:</span> <span id="wallet">100</span> BBR
+    <!-- Home Screen -->
+    <div id="homeScreen">
+      <h1 id="title">Welcome to Aman Bingo</h1>
+      <button onclick="startSetup()">🎮 Play Game</button>
     </div>
 
-    <label id="stakeLabel">Choose Stake:</label>
-    <select id="stakeSelect">
-      <option value="10">10 BBR</option>
-      <option value="20">20 BBR</option>
-      <option value="50">50 BBR</option>
-    </select>
-
-    <div class="selection-area">
-      <div id="numberBoard" class="number-board">
-        <p>Select a number to generate your card:</p>
-        <div id="numberGrid"></div>
+    <!-- Setup Area -->
+    <div id="setupArea" class="hidden">
+      <div class="wallet">
+        <span id="walletLabel">Wallet:</span> <span id="wallet">100</span> BBR
       </div>
+      <label id="stakeLabel">Choose Stake:</label>
+      <select id="stakeSelect">
+        <option value="10">10 BBR</option>
+        <option value="20">20 BBR</option>
+        <option value="50">50 BBR</option>
+      </select>
 
-      <div id="previewArea" class="preview-area">
-        <h2>Card Preview</h2>
-        <div class="card-container">
-          <div class="card-header">
-            <div>B</div><div>I</div><div>N</div><div>G</div><div>O</div>
-          </div>
-          <div id="previewCard" class="card"></div>
+      <div class="selection-area">
+        <div id="numberBoard" class="number-board">
+          <p>Select a number to generate your card:</p>
+          <div id="numberGrid"></div>
         </div>
-        <button onclick="confirmCard()">✅ Confirm</button>
+
+        <div id="previewArea" class="preview-area">
+          <h2>Card Preview</h2>
+          <div class="card-container">
+            <div class="card-header">
+              <div>B</div><div>I</div><div>N</div><div>G</div><div>O</div>
+            </div>
+            <div id="previewCard" class="card"></div>
+          </div>
+          <button onclick="confirmCard()">✅ Confirm</button>
+        </div>
       </div>
     </div>
 
+    <!-- Game Area -->
     <div id="gameArea" class="hidden">
-      <div id="timer">⏱ 30</div>
+      <div id="waitingNotice">Waiting for players... ⏳</div>
+      <div id="timer">⏱ 40</div>
       <div id="ballDisplay">Ball Called: —</div>
       <div id="calledList"><strong>Called Numbers:</strong> <span id="calledNumbers"></span></div>
       <div class="card-container">
@@ -70,6 +78,16 @@
       <button id="bingoBtn" class="hidden" onclick="checkBingo()">🎉 Bingo</button>
       <div id="result"></div>
       <button id="playAgainBtn" class="hidden" onclick="resetGame()">🔁 Play Again</button>
+    </div>
+  </div>
+
+  <!-- Floating Chat Room -->
+  <div id="chatArea">
+    <h3 id="chatTitle">💬 Chat Room</h3>
+    <div id="chatBox"></div>
+    <div class="chat-input-row">
+      <input id="chatInput" placeholder="Type a message..." />
+      <button onclick="sendMessage()">Send</button>
     </div>
   </div>
 
