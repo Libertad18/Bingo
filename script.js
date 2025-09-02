@@ -10,6 +10,7 @@ let wallet = 100;
 let stake = 10;
 let language = 'en';
 let roomId = null;
+let isServerConnected = false;
 
 const translations = {
   en: {
@@ -23,7 +24,7 @@ const translations = {
     bingo: "🎉 Bingo",
     playAgain: "🔁 Play Again",
     insufficientBalance: "Insufficient balance",
-    win: "🎉 You Win!",
+    win: "🎉 You Win! +",
     lose: "❌ Not a winning card",
     someoneWon: "🎉 Someone won!",
     serverError: "Failed to connect to the game server. Using local simulation."
@@ -39,7 +40,7 @@ const translations = {
     bingo: "🎉 ቢንጎ",
     playAgain: "🔁 እንደገና ይጫወቱ",
     insufficientBalance: "በቂ ሒሳብ የለም",
-    win: "🎉 አሸንፈሃል!",
+    win: "🎉 አሸንፈሃል! +",
     lose: "❌ አሸናፊ ካርድ አይደለም",
     someoneWon: "🎉 አንድ ሰው አሸንፏል!",
     serverError: "የጨዋታ አገልጋይ ግንኙነት አልተሳካም። የአካባቢ ማስመሰል በመጠቀም።"
@@ -52,19 +53,29 @@ function toggleTheme() {
   document.body.style.background = isLight
     ? 'linear-gradient(to bottom, #fef3c7, #fed7aa)'
     : 'linear-gradient(to bottom right, #7c3aed, #ec4899)';
+  document.querySelectorAll('.navbar, .number-board, .card-container, #calledList').forEach(el => {
+    el.classList.toggle('light', isLight);
+  });
+  localStorage.setItem('theme', isLight ? 'light' : 'dark');
 }
 
 function changeLanguage(lang) {
   language = lang;
-  document.querySelector('h1').textContent = translations[lang].welcome;
-  document.querySelector('.number-board h3:nth-child(1)').textContent = translations[lang].chooseStake;
-  document.querySelector('.number-board h3:nth-child(3)').textContent = translations[lang].selectNumber;
-  document.querySelector('.preview-area h3').textContent = translations[lang].cardPreview;
-  document.querySelector('.preview-area button').textContent = translations[lang].confirm;
+  document.getElementById('welcome').textContent = translations[lang].welcome;
+  document.getElementById('chooseStake').textContent = translations[lang].chooseStake;
+  document.getElementById('selectNumber').textContent = translations[lang].selectNumber;
+  document.getElementById('cardPreview').textContent = translations[lang].cardPreview;
+  document.getElementById('confirmBtn').textContent = translations[lang].confirm;
   document.getElementById('ballDisplay').textContent = translations[lang].ballCalled;
   document.getElementById('calledList').textContent = translations[lang].calledNumbers;
   document.getElementById('bingoBtn').textContent = translations[lang].bingo;
   document.getElementById('playAgainBtn').textContent = translations[lang].playAgain;
+  localStorage.setItem('language', lang);
+}
+
+function navigate(page) {
+  console.log(`Navigating to ${page}`);
+  // Implement navigation logic if needed
 }
 
 function generateNumberBoard() {
@@ -107,7 +118,7 @@ function confirmCard() {
   socket.emit("startGame", roomId);
 
   startTimer();
-  startNumberCalling(); // Start local number calling as fallback
+  startNumberCalling();
 }
 
 function generateCard(seed) {
@@ -186,12 +197,19 @@ function startTimer() {
 }
 
 function startNumberCalling() {
-  // Fallback for number calling if server is not responding
+  clearInterval(callInterval);
   callInterval = setInterval(() => {
-    const num = Math.floor(Math.random() * 75) + 1;
-    socket.emit("numberCalled", num); // Emit to server
-    handleNumberCalled(num); // Handle locally
-  }, 5000); // Call every 5 seconds
+    const availableNumbers = Array.from({length: 75}, (_, i) => i + 1).filter(n => !calledNumbers.includes(n));
+    if (availableNumbers.length === 0) {
+      clearInterval(callInterval);
+      return;
+    }
+    const num = availableNumbers[Math.floor(Math.random() * availableNumbers.length)];
+    handleNumberCalled(num);
+    if (!isServerConnected) {
+      socket.emit("numberCalled", num); // Emit to server as fallback
+    }
+  }, 3000); // Call every 3 seconds for faster gameplay
 }
 
 function handleNumberCalled(num) {
@@ -229,7 +247,7 @@ function checkBingo() {
   const diagWin2 = [0,1,2,3,4].every(i => markedGrid[i][4 - i]);
 
   if (rowWin || colWin || diagWin1 || diagWin2) {
-    document.getElementById('result').textContent = translations[language].win;
+    document.getElementById('result').textContent = translations[language].win + (stake * 2) + " BBR";
     document.getElementById('winSound').play();
     socket.emit("playerWin", roomId);
     clearInterval(timerInterval);
@@ -257,16 +275,18 @@ function resetGame() {
   document.getElementById('playAgainBtn').classList.add('hidden');
   document.querySelector('.selection-area').classList.remove('hidden');
   calledNumbers = [];
+  changeLanguage(language); // Ensure language persists
 }
 
 socket.on("connect", () => {
   console.log("Connected to server");
+  isServerConnected = true;
 });
 
 socket.on("connect_error", (err) => {
   console.error("Connection error:", err);
   alert(translations[language].serverError);
-  // Continue with local number calling
+  isServerConnected = false;
 });
 
 socket.on("numberCalled", (num) => {
@@ -285,5 +305,11 @@ window.onload = () => {
   generateNumberBoard();
   document.getElementById('themeToggle').onclick = toggleTheme;
   document.getElementById('languageSelect').onchange = (e) => changeLanguage(e.target.value);
-  changeLanguage('en');
+  const savedLanguage = localStorage.getItem('language') || 'en';
+  changeLanguage(savedLanguage);
+  document.getElementById('languageSelect').value = savedLanguage;
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'light') {
+    toggleTheme();
+  }
 };
