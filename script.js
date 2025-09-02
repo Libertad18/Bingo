@@ -26,6 +26,27 @@ function previewCard(seed) {
   previewCardData = generateCard(seed);
   renderCard(previewCardData, 'previewCard');
 }
+function startSetup() {
+  document.getElementById("homeScreen").classList.add("hidden");
+  document.getElementById("setupArea").classList.remove("hidden");
+  generateNumberBoard();
+}
+
+function generateNumberBoard() {
+  const grid = document.getElementById("numberGrid");
+  grid.innerHTML = '';
+  for (let i = 1; i <= 200; i++) {
+    const btn = document.createElement('button');
+    btn.textContent = i;
+    btn.onclick = () => previewCard(i);
+    grid.appendChild(btn);
+  }
+}
+
+function previewCard(seed) {
+  previewCardData = generateCard(seed);
+  renderCard(previewCardData, 'previewCard');
+}
 
 function confirmCard() {
   stake = parseInt(document.getElementById('stakeSelect').value);
@@ -147,4 +168,5 @@ socket.on("announceWinner", () => {
 });
 
 window.onload = generateNumberBoard;
+
 
