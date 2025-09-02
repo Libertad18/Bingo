@@ -1,35 +1,39 @@
 :root {
-  --shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-  --transition: all 0.3s ease;
+  --neon-yellow: #facc15;
+  --neon-pink: #f472b6;
+  --shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+  --transition: all 0.4s ease;
 }
 
 body.light {
-  background: linear-gradient(to bottom, #f0f0f0, #e0e0e0) !important;
+  background: linear-gradient(to bottom, #fef3c7, #fed7aa) !important;
+  color: #1f2937 !important;
 }
 
 .navbar {
-  background-color: #2d004b;
+  background: linear-gradient(to right, #4c1d95, #7e22ce);
 }
 
 .nav-links li {
-  padding: 8px 12px;
-  border-radius: 8px;
+  padding: 10px 16px;
+  border-radius: 10px;
 }
 
 .nav-links li:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--neon-yellow);
 }
 
 .toggles select,
 .toggles button {
-  padding: 6px;
-  border-radius: 8px;
+  padding: 8px;
+  border-radius: 10px;
   transition: var(--transition);
 }
 
 .toggles select:focus,
 .toggles button:focus {
-  outline: 2px solid var(--accent-color);
+  outline: 3px solid var(--neon-yellow);
 }
 
 .number-board {
@@ -37,16 +41,16 @@ body.light {
 }
 
 #numberGrid button {
-  padding: 12px;
-  font-size: 1rem;
-  border-radius: 8px;
+  padding: 14px;
+  font-size: 1.1rem;
+  border-radius: 10px;
   transition: var(--transition);
 }
 
 #numberGrid button:hover {
-  background: #00bfff;
+  background: var(--neon-pink);
   color: white;
-  transform: scale(1.1);
+  transform: scale(1.15);
 }
 
 .card-container {
@@ -54,29 +58,32 @@ body.light {
 }
 
 .card-header div {
-  padding: 10px;
+  padding: 12px;
 }
 
 .card .cell {
-  padding: 16px;
-  font-size: 1.1rem;
-  border-radius: 10px;
+  padding: 18px;
+  font-size: 1.2rem;
+  border-radius: 12px;
   transition: var(--transition);
-}
-
-.card .cell:hover:not(.disabled) {
-  transform: scale(1.1);
   box-shadow: var(--shadow);
 }
 
+.card .cell:hover:not(.disabled) {
+  transform: scale(1.15);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+}
+
 .cell.marked {
-  animation: mark 0.3s ease;
+  background: var(--neon-pink) !important;
+  color: white !important;
+  animation: mark 0.5s ease;
 }
 
 @keyframes mark {
   0% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1.05); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1.1); }
 }
 
 button {
@@ -84,24 +91,24 @@ button {
 }
 
 #calledList::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 
 #calledList::-webkit-scrollbar-thumb {
-  background: #00bfff;
-  border-radius: 4px;
+  background: var(--neon-yellow);
+  border-radius: 5px;
 }
 
 @media (max-width: 768px) {
   .navbar {
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
   }
   .selection-area {
     flex-direction: column;
     align-items: center;
   }
   #numberGrid {
-    grid-template-columns: repeat(5, minmax(40px, 1fr));
+    grid-template-columns: repeat(6, minmax(45px, 1fr));
   }
 }
