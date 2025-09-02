@@ -1,99 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Aman Bingo Multiplayer</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎯 Aman Bingo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"></script>
 </head>
-<body>
-  <nav class="navbar">
-    <div class="logo">🎯 Aman Bingo</div>
-    <ul class="nav-links">
-      <li onclick="showHome()">Home</li>
-      <li>Contact</li>
-      <li>Leaderboard</li>
-      <li>Referral</li>
+<body class="bg-gradient-to-br from-purple-900 to-indigo-900 text-white font-poppins transition-all duration-300">
+  <nav class="navbar bg-indigo-950 p-4 shadow-lg flex justify-between items-center flex-wrap">
+    <div class="logo text-2xl font-bold">🎯 Aman Bingo</div>
+    <ul class="nav-links flex gap-6 flex-wrap">
+      <li class="cursor-pointer hover:text-yellow-400 transition-colors" role="button" tabIndex="0">Home</li>
+      <li class="cursor-pointer hover:text-yellow-400 transition-colors" role="button" tabIndex="0">Contact</li>
+      <li class="cursor-pointer hover:text-yellow-400 transition-colors" role="button" tabIndex="0">Leaderboard</li>
+      <li class="cursor-pointer hover:text-yellow-400 transition-colors" role="button" tabIndex="0">Referral Earning</li>
     </ul>
-    <div class="toggles">
-      <select id="languageToggle" onchange="toggleLanguage()">
-        <option value="en">English</option>
-        <option value="am">አማርኛ</option>
+    <div class="toggles flex gap-4 items-center">
+      <select id="languageSelect" class="bg-transparent text-white border-none cursor-pointer focus:outline-none">
+        <option value="en" class="text-black">English</option>
+        <option value="am" class="text-black">አማርኛ</option>
       </select>
-      <button onclick="toggleTheme()">🌓</button>
+      <button id="themeToggle" class="text-2xl focus:outline-none" aria-label="Toggle theme">🌓</button>
     </div>
   </nav>
-<button onclick="startSetup()">🎮 Play Game</button>
 
-  <div class="container">
-    <!-- Home Screen -->
-    <div id="homeScreen">
-      <h1 id="title">Welcome to Aman Bingo</h1>
-      <button onclick="startSetup()">🎮 Play Game</button>
-    </div>
+  <div class="container mx-auto p-6 max-w-4xl">
+    <h1 class="text-4xl font-bold mb-6 animate-pulse">Welcome to Aman Bingo</h1>
 
-    <!-- Setup Area -->
-    <div id="setupArea" class="hidden">
-      <div class="wallet">
-        <span id="walletLabel">Wallet:</span> <span id="wallet">100</span> BBR
+    <div class="wallet text-lg font-semibold mb-4">Wallet: <span id="wallet">100</span> BBR</div>
+
+    <div class="selection-area flex flex-wrap gap-8 justify-center transition-opacity duration-500">
+      <div class="number-board bg-white bg-opacity-10 rounded-xl p-6 shadow-xl w-full max-w-md">
+        <h3 class="text-xl font-semibold mb-4">Choose Stake:</h3>
+        <select id="stakeSelect" class="w-full p-2 rounded-lg bg-gray-800 text-white mb-4 focus:outline-none">
+          <option value="10">10 BBR</option>
+          <option value="20">20 BBR</option>
+          <option value="50">50 BBR</option>
+        </select>
+        <h3 class="text-xl font-semibold mb-4">Select a number to generate your card:</h3>
+        <div id="numberGrid" class="grid grid-cols-8 gap-2 max-h-80 overflow-y-auto p-4 rounded-lg"></div>
       </div>
-      <label id="stakeLabel">Choose Stake:</label>
-      <select id="stakeSelect">
-        <option value="10">10 BBR</option>
-        <option value="20">20 BBR</option>
-        <option value="50">50 BBR</option>
-      </select>
 
-      <div class="selection-area">
-        <div id="numberBoard" class="number-board">
-          <p>Select a number to generate your card:</p>
-          <div id="numberGrid"></div>
-        </div>
-
-        <div id="previewArea" class="preview-area">
-          <h2>Card Preview</h2>
-          <div class="card-container">
-            <div class="card-header">
-              <div>B</div><div>I</div><div>N</div><div>G</div><div>O</div>
-            </div>
-            <div id="previewCard" class="card"></div>
-          </div>
-          <button onclick="confirmCard()">✅ Confirm</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Game Area -->
-    <div id="gameArea" class="hidden">
-      <div id="waitingNotice">Waiting for players... ⏳</div>
-      <div id="timer">⏱ 40</div>
-      <div id="ballDisplay">Ball Called: —</div>
-      <div id="calledList"><strong>Called Numbers:</strong> <span id="calledNumbers"></span></div>
-      <div class="card-container">
-        <div class="card-header">
+      <div class="preview-area card-container bg-white bg-opacity-10 rounded-xl p-6 shadow-xl w-full max-w-sm">
+        <h3 class="text-xl font-semibold mb-4">Card Preview</h3>
+        <div class="card-header grid grid-cols-5 font-bold text-yellow-400 text-lg mb-2">
           <div>B</div><div>I</div><div>N</div><div>G</div><div>O</div>
         </div>
-        <div id="card" class="card"></div>
+        <div id="previewCard" class="card grid grid-cols-5 gap-3"></div>
+        <button onclick="confirmCard()" class="mt-4 bg-yellow-400 text-gray-900 px-6 py-2 rounded-lg hover:bg-yellow-500 transition-transform transform hover:scale-105 focus:outline-none" aria-label="Confirm card">✅ Confirm</button>
       </div>
-      <button id="bingoBtn" class="hidden" onclick="checkBingo()">🎉 Bingo</button>
-      <div id="result"></div>
-      <button id="playAgainBtn" class="hidden" onclick="resetGame()">🔁 Play Again</button>
+    </div>
+
+    <div id="gameArea" class="hidden">
+      <div id="timer" class="text-2xl font-bold mb-4 text-yellow-400">⏱ 30</div>
+      <div id="ballDisplay" class="text-xl font-semibold mb-4 animate-bounce">Ball Called: —</div>
+      <div id="calledList" class="text-base mb-4 max-h-24 overflow-y-auto p-4 bg-white bg-opacity-10 rounded-lg">Called Numbers: <span id="calledNumbers"></span></div>
+      <div class="card-container bg-white bg-opacity-10 rounded-xl p-6 shadow-xl w-full max-w-sm mx-auto">
+        <div class="card-header grid grid-cols-5 font-bold text-yellow-400 text-lg mb-2">
+          <div>B</div><div>I</div><div>N</div><div>G</div><div>O</div>
+        </div>
+        <div id="card" class="card grid grid-cols-5 gap-3"></div>
+      </div>
+      <button id="bingoBtn" class="hidden mt-4 bg-yellow-400 text-gray-900 px-6 py-2 rounded-lg hover:bg-yellow-500 transition-transform transform hover:scale-105 focus:outline-none" onclick="checkBingo()" aria-label="Check for Bingo">🎉 Bingo</button>
+      <div id="result" class="text-xl font-semibold mt-4"></div>
+      <button id="playAgainBtn" class="hidden mt-4 bg-yellow-400 text-gray-900 px-6 py-2 rounded-lg hover:bg-yellow-500 transition-transform transform hover:scale-105 focus:outline-none" onclick="resetGame()" aria-label="Play again">🔁 Play Again</button>
     </div>
   </div>
 
-  <!-- Floating Chat Room -->
-  <div id="chatArea">
-    <h3 id="chatTitle">💬 Chat Room</h3>
-    <div id="chatBox"></div>
-    <div class="chat-input-row">
-      <input id="chatInput" placeholder="Type a message..." />
-      <button onclick="sendMessage()">Send</button>
-    </div>
-  </div>
+  <audio id="callSound" src="https://assets.mixkit.co/active_storage/sfx/2630/2630-preview.mp3"></audio>
+  <audio id="winSound" src="https://assets.mixkit.co/active_storage/sfx/2007/2007-preview.mp3"></audio>
 
-  <audio id="callSound" src="call.mp3"></audio>
   <script src="script.js"></script>
 </body>
 </html>
-
