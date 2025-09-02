@@ -1,4 +1,4 @@
-const socket = io("https://bingo-xodt.onrender.com"); // Replace with your backend URL
+const socket = io("https://bingo-1-n9o2.onrender.com"); // Replace with your backend URL
 
 let card = [];
 let previewCardData = [];
@@ -147,3 +147,4 @@ socket.on("announceWinner", () => {
 });
 
 window.onload = generateNumberBoard;
+
