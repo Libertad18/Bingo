@@ -3,14 +3,12 @@ const socket = io("https://bingo-1-n9o2.onrender.com", { transports: ['websocket
 let card = [];
 let previewCardData = [];
 let calledNumbers = [];
-let countdown = 30;
-let timerInterval;
-let callInterval;
 let wallet = 100;
 let stake = 10;
 let language = 'en';
 let roomId = null;
 let isServerConnected = false;
+let callInterval;
 
 const translations = {
   en: {
@@ -24,14 +22,14 @@ const translations = {
     bingo: "🎉 Bingo",
     playAgain: "🔁 Play Again",
     insufficientBalance: "Insufficient balance",
-    win: "🎉 You Win! +",
-    lose: "❌ Not a winning card",
-    someoneWon: "🎉 Someone won!",
+    win: "Congratulations! You Win! +",
+    lose: "Sorry, You Lost",
+    someoneWon: "Someone won the game!",
     serverError: "Failed to connect to the game server. Using local simulation."
   },
   am: {
     welcome: "እንኳን ወደ አማን ቢንጎ በደህና መጡ",
-    chooseStake: "ውርርድ ይምረጡ፡",
+    chooseStake: "ውርርድ ይምmረጡ፡",
     selectNumber: "ካርድዎን ለመፍጠር ቁጥር ይምረጡ፡",
     cardPreview: "የካርድ ቅድመ-እይታ",
     confirm: "✅ አረጋግጥ",
@@ -40,9 +38,9 @@ const translations = {
     bingo: "🎉 ቢንጎ",
     playAgain: "🔁 እንደገና ይጫወቱ",
     insufficientBalance: "በቂ ሒሳብ የለም",
-    win: "🎉 አሸንፈሃል! +",
-    lose: "❌ አሸናፊ ካርድ አይደለም",
-    someoneWon: "🎉 አንድ ሰው አሸንፏል!",
+    win: "እንኳን ደስ አለህ! አሸንፈሃል! +",
+    lose: "ይቅርታ, ተሸንፈሃል",
+    someoneWon: "አንድ ሰው ጨዋታውን አሸንፏል!",
     serverError: "የጨዋታ አገልጋይ ግንኙነት አልተሳካም። የአካባቢ ማስመሰል በመጠቀም።"
   }
 };
@@ -53,9 +51,6 @@ function toggleTheme() {
   document.body.style.background = isLight
     ? 'linear-gradient(to bottom, #fef3c7, #fed7aa)'
     : 'linear-gradient(to bottom right, #7c3aed, #ec4899)';
-  document.querySelectorAll('.navbar, .number-board, .card-container, #calledList').forEach(el => {
-    el.classList.toggle('light', isLight);
-  });
   localStorage.setItem('theme', isLight ? 'light' : 'dark');
 }
 
@@ -85,7 +80,7 @@ function generateNumberBoard() {
     const btn = document.createElement('button');
     btn.textContent = i;
     btn.setAttribute('aria-label', `Select number ${i}`);
-    btn.className = 'bg-white text-gray-900 p-4 rounded-lg hover:bg-neon-pink hover:text-white transition-transform transform hover:scale-115';
+    btn.className = 'bg-white text-gray-900 p-2 sm:p-3 rounded-lg hover:bg-neon-pink hover:text-white transition-transform transform hover:scale-115';
     btn.onclick = () => previewCard(i);
     btn.onkeydown = (e) => { if (e.key === 'Enter') previewCard(i); };
     grid.appendChild(btn);
@@ -117,7 +112,6 @@ function confirmCard() {
   socket.emit("joinRoom", roomId);
   socket.emit("startGame", roomId);
 
-  startTimer();
   startNumberCalling();
 }
 
@@ -141,7 +135,7 @@ function renderCard(data, containerId, isPreview = false) {
     for (let col = 0; col < 5; col++) {
       const num = data[col][row];
       const cell = document.createElement('div');
-      cell.className = `cell ${isPreview ? 'disabled' : ''} bg-white text-gray-900 p-5 rounded-lg font-bold text-center`;
+      cell.className = `cell ${isPreview ? 'disabled' : ''} bg-white text-gray-900 p-3 sm:p-4 rounded-lg font-bold text-center`;
       cell.textContent = num;
       cell.setAttribute('aria-label', `Number ${num}`);
       if (!isPreview && num !== "Free") {
@@ -182,34 +176,23 @@ function enableCard() {
   });
 }
 
-function startTimer() {
-  document.getElementById('timer').textContent = `⏱ ${countdown}`;
-  timerInterval = setInterval(() => {
-    countdown--;
-    document.getElementById('timer').textContent = `⏱ ${countdown}`;
-    if (countdown <= 0) {
-      clearInterval(timerInterval);
-      clearInterval(callInterval);
-      document.getElementById('result').textContent = translations[language].lose;
-      document.getElementById('playAgainBtn').classList.remove('hidden');
-    }
-  }, 1000);
-}
-
 function startNumberCalling() {
   clearInterval(callInterval);
   callInterval = setInterval(() => {
     const availableNumbers = Array.from({length: 75}, (_, i) => i + 1).filter(n => !calledNumbers.includes(n));
     if (availableNumbers.length === 0) {
       clearInterval(callInterval);
+      document.getElementById('result').textContent = translations[language].lose;
+      alert(translations[language].lose);
+      document.getElementById('playAgainBtn').classList.remove('hidden');
       return;
     }
     const num = availableNumbers[Math.floor(Math.random() * availableNumbers.length)];
     handleNumberCalled(num);
-    if (!isServerConnected) {
-      socket.emit("numberCalled", num); // Emit to server as fallback
+    if (isServerConnected) {
+      socket.emit("numberCalled", num);
     }
-  }, 3000); // Call every 3 seconds for faster gameplay
+  }, 3000);
 }
 
 function handleNumberCalled(num) {
@@ -217,10 +200,12 @@ function handleNumberCalled(num) {
     calledNumbers.push(num);
     const prefix = getColumnPrefix(num);
     document.getElementById('ballDisplay').textContent = `Ball Called: ${prefix}–${num}`;
-    document.getElementById('calledNumbers').textContent += `${prefix}-${num} `;
+    document.getContent('calledNumbers').textContent += `${prefix}-${num} `;
     document.getElementById('callSound').play();
     autoMarkCard(num);
     enableCard();
+    // Auto-check for Bingo after each number
+    checkBingoAuto();
   }
 }
 
@@ -230,6 +215,32 @@ function getColumnPrefix(num) {
   if (num <= 45) return "N";
   if (num <= 60) return "G";
   return "O";
+}
+
+function checkBingoAuto() {
+  const cells = document.querySelectorAll('#card .cell');
+  const marked = Array.from(cells).map(cell => cell.classList.contains('marked'));
+
+  const markedGrid = [];
+  for (let row = 0; row < 5; row++) {
+    markedGrid[row] = marked.slice(row * 5, row * 5 + 5);
+  }
+
+  const rowWin = markedGrid.some(row => row.every(Boolean));
+  const colWin = [0,1,2,3,4].some(col => markedGrid.every(row => row[col]));
+  const diagWin1 = [0,1,2,3,4].every(i => markedGrid[i][i]);
+  const diagWin2 = [0,1,2,3,4].every(i => markedGrid[i][4 - i]);
+
+  if (rowWin || colWin || diagWin1 || diagWin2) {
+    clearInterval(callInterval);
+    document.getElementById('result').textContent = translations[language].win + (stake * 2) + " BBR";
+    document.getElementById('winSound').play();
+    alert(translations[language].win + (stake * 2) + " BBR");
+    socket.emit("playerWin", roomId);
+    wallet += stake * 2;
+    document.getElementById('wallet').textContent = wallet;
+    document.getElementById('playAgainBtn').classList.remove('hidden');
+  }
 }
 
 function checkBingo() {
@@ -246,25 +257,24 @@ function checkBingo() {
   const diagWin1 = [0,1,2,3,4].every(i => markedGrid[i][i]);
   const diagWin2 = [0,1,2,3,4].every(i => markedGrid[i][4 - i]);
 
-  if (rowWin || colWin || diagWin1 || diagWin2) {
+  if (rowWin Cal colWin || diagWin1 || diagWin2) {
+    clearInterval(callInterval);
     document.getElementById('result').textContent = translations[language].win + (stake * 2) + " BBR";
     document.getElementById('winSound').play();
+    alert(translations[language].win + (stake * 2) + " BBR");
     socket.emit("playerWin", roomId);
-    clearInterval(timerInterval);
-    clearInterval(callInterval);
     wallet += stake * 2;
     document.getElementById('wallet').textContent = wallet;
+    document.getElementById('playAgainBtn').classList.remove('hidden');
   } else {
     document.getElementById('result').textContent = translations[language].lose;
+    alert(translations[language].lose);
   }
-
-  document.getElementById('playAgainBtn').classList.remove('hidden');
 }
 
 function resetGame() {
-  clearInterval(timerInterval);
   clearInterval(callInterval);
-  countdown = 30;
+  calledNumbers = [];
   document.getElementById('gameArea').classList.add('hidden');
   document.getElementById('card').innerHTML = '';
   document.getElementById('ballDisplay').textContent = translations[language].ballCalled;
@@ -274,13 +284,13 @@ function resetGame() {
   document.getElementById('bingoBtn').classList.add('hidden');
   document.getElementById('playAgainBtn').classList.add('hidden');
   document.querySelector('.selection-area').classList.remove('hidden');
-  calledNumbers = [];
-  changeLanguage(language); // Ensure language persists
+  generateNumberBoard();
+  changeLanguage(language);
 }
 
 socket.on("connect", () => {
   console.log("Connected to server");
-  isServerConnected = true;
+  is ServerConnected = true;
 });
 
 socket.on("connect_error", (err) => {
@@ -294,14 +304,15 @@ socket.on("numberCalled", (num) => {
 });
 
 socket.on("announceWinner", () => {
+  clearInterval(callInterval);
   document.getElementById('result').textContent = translations[language].someoneWon;
   document.getElementById('winSound').play();
-  clearInterval(timerInterval);
-  clearInterval(callInterval);
+  alert(translations[language].someoneWon);
   document.getElementById('playAgainBtn').classList.remove('hidden');
 });
 
 window.onload = () => {
+{keyword:generator}
   generateNumberBoard();
   document.getElementById('themeToggle').onclick = toggleTheme;
   document.getElementById('languageSelect').onchange = (e) => changeLanguage(e.target.value);
@@ -313,3 +324,4 @@ window.onload = () => {
     toggleTheme();
   }
 };
+</script>
